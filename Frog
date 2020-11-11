@@ -1,0 +1,68 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Frog : MonoBehaviour
+{
+    //The Serialize field let's the variable stay private but also be editable through the Unity interface. 
+    [SerializeField] private float leftCap; //LeftCap and RightCap get their values designated by the unity editor as well, since this let's me use the same sript for multiple different instances.
+    [SerializeField] private float rightCap;
+    [SerializeField] private float jumpLength = 10f;
+    [SerializeField] private float jumpHeight = 15f;
+    [SerializeField] private LayerMask ground;//This gets applied to all of the surfaces that I want the fox to be able to run on. Theres currently a glitch in the player script that lets you jump infinitely into walls, I'm not sure why.
+    private bool facingLeft = true;
+    private Collider2D coll;
+    private Rigidbody2D rb; //ridgidbody2d is the component that let's you move objects with physics in Unity
+
+    private void Start()
+    {
+        coll = GetComponent<Collider2D>();
+        rb = GetComponent<Rigidbody2D>();
+    }
+
+    private void Update()
+    {
+        if(facingLeft)
+        {
+            if(transform.position.x > leftCap)
+            {
+                //Make sure sprite is facing correct way, fix if not
+                if (transform.localScale.x != 1 && coll.IsTouchingLayers(ground))
+                {
+                    transform.localScale = new Vector3(1, 1, 1);//flips sprite
+                }
+                //Test to see if I am on the ground, if so jump
+                if (coll.IsTouchingLayers(ground))
+                {
+                    //jump
+                    rb.velocity = new Vector2(-jumpLength, jumpHeight);
+                }
+            }
+            //If not face right
+            {
+                facingLeft = false;
+            }
+        }
+        else
+        {
+            if (transform.position.x < rightCap)
+            {
+                //Make sure sprite is facing correct way, fix if not
+                if (transform.localScale.x != -1 && coll.IsTouchingLayers(ground))
+                {
+                    transform.localScale = new Vector3(-1, 1, 1);
+                }
+                //Test to see if I am on the ground, if so jump
+                if (coll.IsTouchingLayers(ground))
+                {
+                    //jump
+                    rb.velocity = new Vector2(jumpLength, jumpHeight);
+                }
+            }
+            //If not face right
+            {
+                facingLeft = true;
+            }
+        }
+    }
+}
